@@ -11,15 +11,20 @@ function my_wget(){
 
 play_style=$1
 grade_id=$2
-play_style=1
-grade_id=14
+dir=$3
+
+
 tmp_file=`mktemp`
+change_proxy
+wget "http://p.eagate.573.jp/game/2dx/22/p/ranking/dani.html?play_style="$play_style"&grade_id="$grade_id"&display=1" --load-cookie=cookies.txt -O $tmp_file
 
-date_dir=`date "+%Y%m%d"`
-dir=./data/$date_dir/$play_style/$grade_id
-mkdir -p $dir
+if test `grep "/game/2dx/22/p/djdata/data_another" $tmp_file | wc -l` -eq 0; then
+  echo "クッキーを更新してください"
+  cat /dev/null > cookies.json
+  rm -f cookies.txt
+  exit 1
+fi
 
-wget "http://p.eagate.573.jp/game/2dx/22/p/ranking/dani.html?play_style="$play_style"&grade_id="$grade_id"&display=1" -O $tmp_file
 page_max=`sed -e 's|>|>\n|g' $tmp_file | grep -o "/game/2dx/22/p/ranking/dani.html?page=.*&play_style=.*&grade_id=.*&display=1" | sort | uniq | wc -l`
 
 for page in {0..$page_max}; do
