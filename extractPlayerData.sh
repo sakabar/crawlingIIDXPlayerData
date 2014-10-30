@@ -2,12 +2,7 @@
 
 play_style=$1
 grade_id=$2
-play_style=1
-grade_id=14
-date_dir=`date "+%Y%m%d"`
-dir=./data/$date_dir/$play_style/$grade_id
-
-
+dir=$3
 
 for f in $dir/dani*_orig.html; do
   mid=$f:r"_mid.html"

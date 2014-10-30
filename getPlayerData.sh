@@ -11,19 +11,19 @@ function my_wget(){
 
 play_style=$1
 grade_id=$2
-play_style=1
-grade_id=14
-date_dir=`date "+%Y%m%d"`
-dir=./data/$date_dir/$play_style/$grade_id
-dir="./data/20141018/1/14"
-
-
+dir=$3
 
 domain="http://p.eagate.573.jp"
  
-for url in `awk -F, '{print $1}' $dir/result.txt`; do
+#trしないと、スペースで切れる
+for line in `cat $dir/result.txt | tr ' ' '_'`; do
+  url=`echo $line | awk -F, '{print $1}'`
+
+  #保存するファイル名はどうする?
   player_url=$domain$url
-  output=$dir"/nagisa.html"
+  # output=$dir"/nagisa.html"
+  output=`mktemp`
+  # echo $output
 
   my_wget $player_url $output
 
@@ -38,5 +38,15 @@ for url in `awk -F, '{print $1}' $dir/result.txt`; do
 
     my_wget $player_url $output
   fi
-exit
+
+  # echo `grep -o "<td>[0-9]\{4\}-[0-9]\{4\}</td>" $output`
+  iidx_id=`grep -o "<td>[0-9]\{4\}-[0-9]\{4\}</td>" $output | sed -e 's|<[^>]*>||g' | tr -d '-'`
+
+  #DJP(ALL), DJP(SP), DJP(DP), 段(SP), 段(DP)
+  points=`nkf -w $output | grep -o "<td class=\"point\">[^<]*</td>" | sed -e 's/<[^>]*>//g' | sed -e 's/pt.$//' | tr '\n' ','`
+
+  #情報を追記して出力
+  echo $line$iidx_id","$points
+
+  rm -f $output
 done
