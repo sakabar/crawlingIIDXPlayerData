@@ -30,6 +30,12 @@ page_max=`sed -e 's|>|>\n|g' $tmp_file | grep -o "/game/2dx/22/p/ranking/dani.ht
 for page in {0..$page_max}; do
   dani_url="http://p.eagate.573.jp/game/2dx/22/p/ranking/dani.html?page="$page"&play_style="$play_style"&grade_id="$grade_id"&display=1"
   output=$dir/dani$page"_orig.html"
+
+  #既にファイルが存在していたらスキップ
+  if test -e $output; then
+    continue
+  fi
+
   my_wget $dani_url $output
 
   #wgetが失敗したら、proxyを切り換えて再試行
