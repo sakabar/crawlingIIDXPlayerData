@@ -25,4 +25,4 @@ fi
 
 ./extractPlayerData.sh $play_style $grade_id $dir
 
-#./getPlayerData.sh
+./getPlayerData.sh $play_style $grade_id $dir > $dir"/informative_result.txt"
